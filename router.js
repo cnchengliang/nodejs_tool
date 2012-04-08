@@ -2,19 +2,20 @@
 define([
 	'actions/test',
 	'actions/taobao/comment',
-	'actions/weibo/feed'
-	], function (testAction,taobaoCommentAction,weiboFeedAction) {
+	'actions/weibo/feed',
+	'actions/personal/feed'
+	], function (testAction,taobaoCommentAction,weiboFeedAction,personalAction) {
 
 	var fs = require('fs');
 	//配置数据库
-	var DB = require('mysql').Client;
-	var client = new DB();
+	var DB = require('mysql');
+	var client = DB.createClient();
 	client.user = 'root';
 	client.password = '123456';
 
 	//日志文件
 	var log = fs.createWriteStream('log.txt', {'flags': 'a'});
-
+/*
 	//连接数据库 
 	client.connect(function(error, results) {
 	  	if(error) {
@@ -24,7 +25,7 @@ define([
 		console.log('Connected to MySQL');
 	  	ClientConnectionReady(client);
 	});
-
+*/
 	//打开函数
 	ClientConnectionReady = function(client)
 	{
@@ -38,6 +39,7 @@ define([
 		});
 		console.log('init...');
 	}
+	ClientConnectionReady(client);
 	
 	var actions = function(options) {
 
@@ -63,6 +65,9 @@ define([
 				weiboFeedAction.initialize(client,log,options[2]);
 				weiboFeedAction.handle_db_replace();
 				break;
+			case 'personal_feed':
+				personalAction.initialize(client,log,options[2]);
+				personalAction.listening(options[1]);
 		}
 	}
 	
